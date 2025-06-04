@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+body {
+    font-family: 'Inter', 'Roboto', 'Arial', sans-serif;
+    font-weight: normal;
+}
