@@ -1,62 +1,26 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const departments = [
-  { name: "Tất cả", count: 483 },
-  { name: "Khoa Răng Miệng", count: 36 },
-  { name: "Khoa Xương Cốt", count: 28 },
-  { name: "Khoa Chuẩn Đoán", count: 18 },
-  { name: "Khoa Tim Mạch", count: 22 },
-  { name: "Khoa Phẫu Thuật", count: 14 },
-  { name: "Khoa Mắt Mũi", count: 11 },
-];
-
-const doctors = [
-  {
-    id: 1,
-    name: "PGS.TS - Nguyễn Thị Ngọc Lan",
-    position: "Phó giáo sư, Tiến sĩ",
-    department: "Khoa Tim Mạch",
-    hospital: "Bệnh viện Đa khoa Hồng Ngọc – Phúc Trường Minh",
-    avatar: "/doctor1.jpg",
-  },
-  {
-    id: 2,
-    name: "ThS.BSCKII - Bùi Thanh Tiến",
-    position: "Thạc sĩ | Bác sĩ Chuyên khoa II",
-    department: "Khoa Xương Cốt",
-    hospital: "Bệnh viện Đa khoa Hồng Ngọc – Phúc Trường Minh",
-    avatar: "/doctor2.jpg",
-  },
-  {
-    id: 3,
-    name: "PGS.TS - Trần Thị Minh Hoa",
-    position: "Phó Giáo sư, Tiến sĩ",
-    department: "Khoa Răng Miệng",
-    hospital: "Bệnh viện Đa khoa Hồng Ngọc – Phúc Trường Minh",
-    avatar: "/doctor3.jpg",
-  },
-  {
-    id: 4,
-    name: "TTƯT.ThS.BSCKI - Bùi Xuân Quyền",
-    position: "Thầy thuốc ưu tú | Thạc sĩ | Bác sĩ Chuyên khoa I",
-    department: "Khoa Phẫu Thuật",
-    hospital: "Bệnh viện Đa khoa Hồng Ngọc – Phúc Trường Minh",
-    avatar: "/doctor4.jpg",
-  },
-];
-
-export default function SearchDoctor() {
+export default function SearchDoctor({ doctors }) {
+  const specialtys = [
+    { name: "Tất cả"},
+    { name: "Khoa Răng Miệng"},
+    { name: "Khoa Xương Cốt"},
+    { name: "Khoa Chuẩn Đoán"},
+    { name: "Khoa Tim Mạch"},
+    { name: "Khoa Phẫu Thuật"},
+    { name: "Khoa Mắt Mũi"},
+  ];
   const [selectedDept, setSelectedDept] = useState("Tất cả");
   const [search, setSearch] = useState("");
-
-  const filteredDoctors = doctors.filter(
+  console.log(doctors)
+  const filteredDoctors = (doctors ?? []).filter(
     (doc) =>
-      (selectedDept === "Tất cả" || doc.department === selectedDept) &&
-      (doc.name.toLowerCase().includes(search.toLowerCase()) ||
-        doc.position.toLowerCase().includes(search.toLowerCase()) ||
-        doc.department.toLowerCase().includes(search.toLowerCase()))
+      (selectedDept === "Tất cả" || doc.specialty === selectedDept) &&
+      (doc.full_name.toLowerCase().includes(search.toLowerCase()) ||
+        doc.degree.toLowerCase().includes(search.toLowerCase()) ||
+        doc.specialty.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -64,11 +28,6 @@ export default function SearchDoctor() {
       <div className="w-80 shrink-0">
         <div className="flex items-center gap-2 mb-4">
           <span className="font-semibold text-lg">Bộ lọc</span>
-        </div>
-        <div className="flex gap-2 mb-4">
-          <select className="border rounded px-3 py-2 w-1/2 focus:border-teal-700 outline-none">
-            <option>Chọn theo khoa</option>
-          </select>
         </div>
         <div className="mb-4">
           <div className="relative">
@@ -86,7 +45,7 @@ export default function SearchDoctor() {
           </div>
         </div>
         <div className="flex flex-col gap-1">
-          {departments.map((dept, idx) => (
+          {specialtys.map((dept, idx) => (
             <button
               key={dept.name}
               onClick={() => setSelectedDept(dept.name)}
@@ -97,15 +56,6 @@ export default function SearchDoctor() {
               }`}
             >
               <span>{dept.name}</span>
-              <span
-                className={`ml-2 text-sm px-2 py-0.5 rounded ${
-                  selectedDept === dept.name
-                    ? "bg-teal-800"
-                    : "bg-gray-100 text-gray-700"
-                }`}
-              >
-                {dept.count}
-              </span>
             </button>
           ))}
         </div>
@@ -113,35 +63,29 @@ export default function SearchDoctor() {
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
         {filteredDoctors.map((doc) => (
           <div
-            key={doc.id}
+            key={doc.user_id}
             className="flex gap-6 items-center border-b pb-6"
           >
             <img
-              src={doc.avatar}
-              alt={doc.name}
+              src={doc.img}
+              alt={doc.full_name}
               className="w-40 h-40 object-cover rounded shadow"
               draggable={false}
             />
             <div>
-              <h3 className="font-bold text-xl mb-1">{doc.name}</h3>
-              <a
-                href="#"
-                className="text-teal-700 text-sm font-semibold hover:underline"
-              >
-                Xem chi tiết
-              </a>
+              <h3 className="font-bold text-xl mb-1">{doc.full_name}</h3>
               <div className="mt-2 flex flex-col gap-1 text-gray-700 text-[15px]">
-                <div>
-                  <span className="material-icons text-sm align-middle mr-1">school</span>
-                  {doc.position}
+                <div className="flex gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+                  </svg>
+                  {doc.degree}
                 </div>
-                <div>
-                  <span className="material-icons text-sm align-middle mr-1">location_on</span>
-                  {doc.hospital}
-                </div>
-                <div>
-                  <span className="material-icons text-sm align-middle mr-1">local_hospital</span>
-                  <span>{doc.department}</span>
+                <div className="flex gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                  </svg>
+                  <span>{doc.specialty}</span>
                 </div>
               </div>
             </div>

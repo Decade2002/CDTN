@@ -3,13 +3,13 @@
 import { useState } from "react";
 
 const categories = [
-  { name: "Tất cả", count: 18 },
-  { name: "Khoa Răng Miệng", count: 3 },
-  { name: "Khoa Xương Cốt", count: 3 },
-  { name: "Khoa Chuẩn Đoán", count: 3 },
-  { name: "Khoa Tim Mạch", count: 3 },
-  { name: "Khoa Phẫu Thuật", count: 3 },
-  { name: "Khoa Mắt Mũi", count: 3 },
+  { name: "Tất cả"},
+  { name: "Khoa Răng Miệng"},
+  { name: "Khoa Xương Cốt"},
+  { name: "Khoa Chuẩn Đoán"},
+  { name: "Khoa Tim Mạch"},
+  { name: "Khoa Phẫu Thuật"},
+  { name: "Khoa Mắt Mũi"},
 ];
 
 const services = [

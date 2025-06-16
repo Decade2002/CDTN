@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { stringify } from "querystring";
 
 export default function LoginForm() {
   const [form, setForm] = useState({
@@ -10,8 +11,7 @@ export default function LoginForm() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  // const [userInfo, setUserInfo] = useState(null);
-  const router = useRouter()
+  const router = useRouter();
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -20,26 +20,32 @@ export default function LoginForm() {
       [name]: value,
     }));
   };
+  
+  const onLogin = (access_token) => {
+    localStorage.setItem('isSignedIn', JSON.stringify('true'))
+    localStorage.setItem('access_token', JSON.stringify(access_token))
+    console.log(JSON.parse(localStorage.getItem('user')))
+    window.location.href = "/"
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    // setUserInfo(null);
     setLoading(true);
+
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("http://localhost:8000/api/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(form),
       });
+      const data = await response.json();
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data?.message || "Sai tên đăng nhập hoặc mật khẩu.");
       }
-      const data = await response.json();
-      // setUserInfo(data);
+      onLogin(data.access_token);
     } catch (err) {
       setError(err.message || "Sai tên đăng nhập hoặc mật khẩu.");
     } finally {
@@ -91,13 +97,13 @@ export default function LoginForm() {
         </div>
       </form>
       <div className="mt-6 flex items-center gap-2 text-base">
-        <span>Chưa có tài khoản?</span>
+        <span>Quên mật khẩu?</span>
         <button
           className="px-4 py-1  text-teal-700  font-semibold cursor-pointer transition"
-          onClick={() => router.push("/signUp")}
+          onClick={() => router.push("/resetpassword")}
           type="button"
         >
-          Đăng ký
+          Tìm lại mật khẩu
         </button>
       </div>
     </div>
