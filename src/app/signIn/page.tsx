@@ -24,7 +24,6 @@ export default function LoginForm() {
   const onLogin = (access_token) => {
     localStorage.setItem('isSignedIn', JSON.stringify('true'))
     localStorage.setItem('access_token', JSON.stringify(access_token))
-    console.log(JSON.parse(localStorage.getItem('user')))
     window.location.href = "/"
   };
 

@@ -11,6 +11,10 @@ export default function AppointmentCalendar() {
   const [error, setError] = useState("");
   const [appointments, setAppointments] = useState([]);
 
+  // For cancel popup
+  const [showCancelPopup, setShowCancelPopup] = useState(false);
+  const [appointmentToCancel, setAppointmentToCancel] = useState(null);
+
   useEffect(() => {
     setError("");
     setSuccess("");
@@ -29,9 +33,7 @@ export default function AppointmentCalendar() {
         return response.json();
       })
       .then((data) => {
-        // Adjust this if your API doesn't return appointments directly as an array
         setAppointments(data.data);
-        console.log(data.data[0])
         setLoading(false);
       })
       .catch((err) => {
@@ -49,7 +51,6 @@ export default function AppointmentCalendar() {
   function parseYYYYDDMM(dateString) {
     // Expected format: "YYYY-DD-MM"
     const [year, day, month] = dateString.split("-");
-    // JavaScript months are 0-based, so subtract 1 from month
     return new Date(Number(year), Number(month) - 1, Number(day));
   }
 
@@ -57,7 +58,6 @@ export default function AppointmentCalendar() {
   const daysWithAppointments = appointments
     .filter((a) => {
       const d = parseYYYYDDMM(a.appointment_day);
-      // console.log(d.getDate())
       return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
     })
     .map((a) => parseYYYYDDMM(a.appointment_day).getDate());
@@ -78,9 +78,45 @@ export default function AppointmentCalendar() {
     (a) => a.appointment_day === selectedDate
   );
 
-  console.log("appointments", appointments);
-  console.log("selectedDate", selectedDate);
-  console.log("selectedAppointments", selectedAppointments);
+  const appointmentStatus = (id) => {
+    const status = appointments.filter((a) => a.appointment_id === id)
+    if(status[0].appointment_status === "pending") {
+      return "Đã lên lịch"
+    } else if(status[0].appointment_status === "confirmed")
+      return "Đã hoàn thành"
+    else return "Đã bị hủy"
+  }
+
+  // Cancel appointment handler
+  const handleCancelAppointment = async () => {
+    if (!appointmentToCancel) return;
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    const access_token = JSON.parse(localStorage.getItem('access_token'));
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/appointments/${appointmentToCancel.appointment_id}/cancel/`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to cancel appointment.");
+      setSuccess("Đã hủy lịch hẹn thành công!");
+      setShowCancelPopup(false);
+      setAppointmentToCancel(null);
+    } catch (err) {
+      setError(err.message);
+      setShowCancelPopup(false);
+      setAppointmentToCancel(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="mt-10 mb-10 max-w-lg mx-auto bg-white rounded shadow p-6 border border-teal-600">
@@ -134,7 +170,6 @@ export default function AppointmentCalendar() {
           const dateStr = formatDate(currentYear, currentMonth, day);
           const isToday =
             dateStr === formatDate(today.getFullYear(), today.getMonth(), today.getDate());
-          // console.log(daysWithAppointments)
           const hasAppointment = daysWithAppointments.includes(day);
           const isSelected = selectedDate === dateStr;
           return (
@@ -155,6 +190,9 @@ export default function AppointmentCalendar() {
           );
         })}
       </div>
+      {/* Success/Error Message */}
+      {success && <div className="mt-4 text-green-700 font-semibold">{success}</div>}
+      {error && <div className="mt-4 text-red-600 font-semibold">{error}</div>}
       {/* Detail for selected date */}
       {selectedDate && (
         <div className="mt-6">
@@ -167,8 +205,8 @@ export default function AppointmentCalendar() {
             <ul className="space-y-2">
               {selectedAppointments.map((a, idx) => (
                 <li
-                  key={idx}
-                  className="p-3 rounded border border-teal-200 bg-teal-50 flex flex-col"
+                  key={a.appointment_id}
+                  className="p-3 rounded border border-teal-200 bg-teal-50 flex flex-col relative"
                 >
                   <span>
                     <span className="font-semibold">Giờ hẹn:</span> {a.appointment_time}
@@ -176,10 +214,54 @@ export default function AppointmentCalendar() {
                   <span>
                     <span className="font-semibold">Bác sĩ:</span> {a.doctor.full_name}
                   </span>
+                  <span>
+                    <span className="font-semibold">Tình trạng :</span> {appointmentStatus(a.appointment_id)}
+                  </span>
+                  {a.appointment_status !== "cancelled" ? 
+                    <button
+                      className={`absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded`}
+                      onClick={() => {
+                        setShowCancelPopup(true);
+                        setAppointmentToCancel(a);
+                      }}
+                      disabled={loading}
+                    >
+                      Huỷ lịch
+                    </button> :
+                    <div></div>
+                  }
                 </li>
               ))}
             </ul>
           )}
+        </div>
+      )}
+      {/* Cancel Confirmation Popup */}
+      {showCancelPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+          <div className="bg-white p-6 rounded shadow-lg border border-teal-600 w-full max-w-xs">
+            <div className="font-bold text-red-700 mb-3">Xác nhận huỷ lịch hẹn</div>
+            <div className="mb-4">Bạn có chắc chắn muốn huỷ lịch hẹn này?</div>
+            <div className="flex justify-end space-x-2">
+              <button
+                className="px-3 py-1 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+                onClick={() => {
+                  setShowCancelPopup(false);
+                  setAppointmentToCancel(null);
+                }}
+                disabled={loading}
+              >
+                Không
+              </button>
+              <button
+                className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600"
+                onClick={handleCancelAppointment}
+                disabled={loading}
+              >
+                {loading ? "Đang huỷ..." : "Có"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

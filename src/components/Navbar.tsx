@@ -116,7 +116,7 @@ export default function Navbar() {
                       Xem lịch hẹn
                     </Link>
                     <Link
-                      href="/results"
+                      href="/result"
                       className="block px-4 py-3 hover:bg-teal-50 text-teal-800 font-medium"
                       onClick={() => setOpenDropdown(false)}
                     >
