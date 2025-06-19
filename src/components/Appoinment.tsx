@@ -10,6 +10,7 @@ export default function AppointmentCalendar() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [appointments, setAppointments] = useState([]);
+  const [resetCancelled, setResetCancelled] = useState(false)
 
   // For cancel popup
   const [showCancelPopup, setShowCancelPopup] = useState(false);
@@ -33,14 +34,16 @@ export default function AppointmentCalendar() {
         return response.json();
       })
       .then((data) => {
-        setAppointments(data.data);
+        if(data.data !== undefined) setAppointments(data.data);
+        else setAppointments([])
+        console.log(appointments)
         setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
-  }, []);
+  }, [resetCancelled]);
 
   // Calendar calculations
   const firstDay = new Date(currentYear, currentMonth, 1);
@@ -50,21 +53,26 @@ export default function AppointmentCalendar() {
 
   function parseYYYYDDMM(dateString) {
     // Expected format: "YYYY-DD-MM"
-    const [year, day, month] = dateString.split("-");
+    const [year, month, day] = dateString.split("-");
+    // console.log(year, day, month)
     return new Date(Number(year), Number(month) - 1, Number(day));
   }
 
   // Find days with appointments in the current month
-  const daysWithAppointments = appointments
-    .filter((a) => {
-      const d = parseYYYYDDMM(a.appointment_day);
-      return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
-    })
-    .map((a) => parseYYYYDDMM(a.appointment_day).getDate());
-
+  const daysWithAppointments = []
+  if(appointments.length !== 0 || appointments !== undefined) {
+    daysWithAppointments.push(...
+      appointments
+      .filter((a) => {
+        const d = parseYYYYDDMM(a.appointment_day);
+        return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+      })
+      .map((a) => parseYYYYDDMM(a.appointment_day).getDate())
+    )
+  }
   // Format YYYY-MM-DD
   const formatDate = (y, m, d) =>
-    `${y}-${String(d).padStart(2, "0")}-${String(m + 1).padStart(2, "0")}`;
+    `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
   // Vietnamese months
   const months = [
@@ -75,16 +83,23 @@ export default function AppointmentCalendar() {
   const startDay = firstDay.getDay() === 0 ? 7 : firstDay.getDay();
 
   const selectedAppointments = appointments.filter(
-    (a) => a.appointment_day === selectedDate
+    (a) => {
+      return a.appointment_day === selectedDate}
   );
 
   const appointmentStatus = (id) => {
     const status = appointments.filter((a) => a.appointment_id === id)
     if(status[0].appointment_status === "pending") {
-      return "Đã lên lịch"
+      return "Đã đặt cọc"
     } else if(status[0].appointment_status === "confirmed")
       return "Đã hoàn thành"
-    else return "Đã bị hủy"
+      else if(status[0].appointment_status === "unpaid_deposit") 
+        return "Chưa thanh toán" 
+      else if(status[0].appointment_status === "confirmed") 
+        return "Đã xác nhận" 
+      else if(status[0].appointment_status === "full") 
+        return "Đang hoàn thành" 
+      else return "Đã bị hủy"
   }
 
   // Cancel appointment handler
@@ -109,6 +124,7 @@ export default function AppointmentCalendar() {
       setSuccess("Đã hủy lịch hẹn thành công!");
       setShowCancelPopup(false);
       setAppointmentToCancel(null);
+      setResetCancelled(!resetCancelled)
     } catch (err) {
       setError(err.message);
       setShowCancelPopup(false);
@@ -168,8 +184,10 @@ export default function AppointmentCalendar() {
         ))}
         {daysInMonth.map((day) => {
           const dateStr = formatDate(currentYear, currentMonth, day);
+          // console.log(dateStr)
           const isToday =
             dateStr === formatDate(today.getFullYear(), today.getMonth(), today.getDate());
+          // console.log(dateStr)
           const hasAppointment = daysWithAppointments.includes(day);
           const isSelected = selectedDate === dateStr;
           return (

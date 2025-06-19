@@ -23,11 +23,13 @@ export default function ResetPassword() {
         headers: { "Content-Type": "application/json"},
         body: JSON.stringify({ gmail }),
       });
-      if (!response.ok) throw new Error("Failed to send OTP. Please check your Gmail.");
+      const data = await response.json()
+      if (!response.ok) throw new Error(data?.message || {"message" :"Sai Gmail"});
       setOtpSent(true);
-      setMsg("OTP has been sent to your Gmail.");
+      setMsg("OTP đã được gửi đến Gmail.");
     } catch (err) {
-      setError(err.message || "Something went wrong!");
+      console.log(err.message)
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -57,7 +59,7 @@ export default function ResetPassword() {
       });
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.detail || "Failed to reset password.");
+        throw new Error(data);
       }
       setMsg("Password reset successful. You can now log in.");
       setOtp("");
@@ -65,7 +67,6 @@ export default function ResetPassword() {
       setConfirmPassword("");
       useRouter().push("/signIn")
     } catch (err) {
-      setError(err.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }

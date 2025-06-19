@@ -1,161 +1,274 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const categories = [
-  { name: "Tất cả"},
-  { name: "Khoa Răng Miệng"},
-  { name: "Khoa Xương Cốt"},
-  { name: "Khoa Chuẩn Đoán"},
-  { name: "Khoa Tim Mạch"},
-  { name: "Khoa Phẫu Thuật"},
-  { name: "Khoa Mắt Mũi"},
-];
-
+// Add as many services as you want, including those from previous messages.
+// (Here's some from before, and a few new ones for demo.)
 const services = [
   {
     id: 1,
     title: "Điều trị sâu răng",
     desc: "Loại bỏ phần răng bị sâu và trám lại giúp bảo vệ răng thật.",
     image: "/dental1.png",
-    category: "Khoa Răng Miệng",
+    category: "Khoa Răng hàm mặt",
   },
   {
     id: 2,
     title: "Chỉnh nha - Niềng răng",
     desc: "Chỉnh hình răng lệch lạc, hô, móm bằng các phương pháp niềng hiện đại.",
     image: "/dental2.png",
-    category: "Khoa Răng Miệng",
+    category: "Khoa Răng hàm mặt",
   },
   {
     id: 3,
     title: "Lấy cao răng & tẩy trắng răng",
     desc: "Loại bỏ mảng bám và làm trắng răng, giúp nụ cười tươi sáng.",
     image: "/dental3.png",
-    category: "Khoa Răng Miệng",
+    category: "Khoa Răng hàm mặt",
   },
-
   {
     id: 4,
-    title: "Điều trị thoái hóa khớp",
-    desc: "Điều trị nội khoa và vật lý trị liệu giúp giảm đau và phục hồi vận động.",
-    image: "/bone1.png",
-    category: "Khoa Xương Cốt",
+    title: "Khám nội tổng quát",
+    desc: "Tầm soát sức khỏe tổng thể, phát hiện sớm các bệnh lý nội khoa.",
+    image: "/internal1.png",
+    category: "Khoa Nội khoa",
   },
   {
     id: 5,
-    title: "Nắn chỉnh xương gãy",
-    desc: "Xử lý chấn thương, gãy xương bằng bó bột hoặc phẫu thuật.",
-    image: "/bone2.png",
-    category: "Khoa Xương Cốt",
-  },
-  {
-    id: 6,
-    title: "Tiêm huyết tương giàu tiểu cầu (PRP)",
-    desc: "Kích thích phục hồi mô xương, khớp bằng công nghệ sinh học.",
-    image: "/bone3.png",
-    category: "Khoa Xương Cốt",
-  },
-
-  {
-    id: 7,
-    title: "Chụp X-quang",
-    desc: "Phát hiện tổn thương xương, phổi, và các cơ quan khác.",
-    image: "/diagnostic1.png",
-    category: "Khoa Chuẩn Đoán",
-  },
-  {
-    id: 8,
-    title: "Siêu âm tổng quát",
-    desc: "Kiểm tra các cơ quan nội tạng, phát hiện bất thường sớm.",
-    image: "/diagnostic2.png",
-    category: "Khoa Chuẩn Đoán",
-  },
-  {
-    id: 9,
-    title: "Chụp cộng hưởng từ (MRI)",
-    desc: "Chẩn đoán chính xác các bệnh lý não, tủy sống, khớp.",
-    image: "/diagnostic3.png",
-    category: "Khoa Chuẩn Đoán",
-  },
-
-  {
-    id: 10,
-    title: "Điện tâm đồ (ECG)",
-    desc: "Kiểm tra hoạt động và nhịp đập của tim, phát hiện rối loạn tim mạch.",
-    image: "/cardio1.png",
-    category: "Khoa Tim Mạch",
-  },
-  {
-    id: 11,
     title: "Siêu âm tim",
     desc: "Đánh giá cấu trúc và chức năng tim qua hình ảnh siêu âm.",
     image: "/cardio2.png",
-    category: "Khoa Tim Mạch",
+    category: "Khoa Nội khoa",
   },
   {
-    id: 12,
-    title: "Đo huyết áp 24h",
-    desc: "Theo dõi huyết áp liên tục, hỗ trợ chẩn đoán tăng huyết áp.",
-    image: "/cardio3.png",
-    category: "Khoa Tim Mạch",
+    id: 6,
+    title: "Khám da liễu",
+    desc: "Chẩn đoán và điều trị các bệnh lý về da, tóc, móng.",
+    image: "/derma1.png",
+    category: "Khoa Da liễu",
   },
-
   {
-    id: 13,
+    id: 7,
+    title: "Điều trị mụn",
+    desc: "Chăm sóc và điều trị mụn trứng cá hiệu quả.",
+    image: "/derma2.png",
+    category: "Khoa Da liễu",
+  },
+  {
+    id: 8,
+    title: "Khám mắt",
+    desc: "Kiểm tra thị lực, sàng lọc các bệnh lý về mắt.",
+    image: "/eye1.png",
+    category: "Khoa Mắt",
+  },
+  {
+    id: 9,
     title: "Phẫu thuật nội soi",
     desc: "Ít xâm lấn, phục hồi nhanh, giảm đau sau mổ.",
     image: "/surgery1.png",
-    category: "Khoa Phẫu Thuật",
+    category: "Khoa Ngoại khoa",
   },
   {
-    id: 14,
-    title: "Phẫu thuật chỉnh hình",
-    desc: "Điều trị dị tật, phục hồi thẩm mỹ và chức năng cơ thể.",
-    image: "/surgery2.png",
-    category: "Khoa Phẫu Thuật",
-  },
-  {
-    id: 15,
+    id: 10,
     title: "Cắt bỏ u bướu",
     desc: "Loại bỏ các khối u lành tính hoặc ác tính bằng phương pháp hiện đại.",
     image: "/surgery3.png",
-    category: "Khoa Phẫu Thuật",
+    category: "Khoa Ngoại khoa",
   },
-
+  {
+    id: 11,
+    title: "Khám nhi tổng quát",
+    desc: "Kiểm tra sức khỏe định kỳ cho trẻ em.",
+    image: "/pediatrics1.png",
+    category: "Khoa Nhi khoa",
+  },
+  {
+    id: 12,
+    title: "Điều trị viêm xoang",
+    desc: "Kết hợp thuốc và phẫu thuật nội soi mũi xoang.",
+    image: "/ent1.png",
+    category: "Khoa Tai mũi họng",
+  },
+  {
+    id: 13,
+    title: "Khám Sản phụ khoa",
+    desc: "Kiểm tra sức khỏe phụ nữ, thai kỳ, tư vấn sinh sản.",
+    image: "/obgyn1.png",
+    category: "Khoa Sản phụ khoa",
+  },
+  {
+    id: 14,
+    title: "Khám tiền sản",
+    desc: "Tư vấn, kiểm tra sức khỏe mẹ và bé trước sinh nhằm đảm bảo thai kỳ an toàn.",
+    image: "/obgyn2.png",
+    category: "Khoa Sản phụ khoa",
+  },
+  {
+    id: 15,
+    title: "Siêu âm thai",
+    desc: "Theo dõi sự phát triển của thai nhi, phát hiện dị tật sớm.",
+    image: "/obgyn3.png",
+    category: "Khoa Sản phụ khoa",
+  },
   {
     id: 16,
-    title: "Phẫu thuật cận thị, loạn thị",
-    desc: "Laser hoặc đặt kính nội nhãn giúp cải thiện thị lực.",
-    image: "/eye1.png",
-    category: "Khoa Mắt Mũi",
+    title: "Khám mắt chuyên sâu",
+    desc: "Tư vấn các bệnh lý phức tạp về mắt, theo dõi và điều trị lâu dài.",
+    image: "/eye2.png",
+    category: "Khoa Mắt",
   },
   {
     id: 17,
-    title: "Điều trị viêm xoang",
-    desc: "Kết hợp thuốc và phẫu thuật nội soi mũi xoang.",
-    image: "/eye2.png",
-    category: "Khoa Mắt Mũi",
+    title: "Phẫu thuật đục thủy tinh thể",
+    desc: "Điều trị đục thủy tinh thể bằng phương pháp phẫu thuật hiện đại.",
+    image: "/eye3.png",
+    category: "Khoa Mắt",
   },
   {
     id: 18,
-    title: "Lấy dị vật mắt, mũi",
-    desc: "Xử lý nhanh chóng an toàn các trường hợp dị vật đường thở, mắt.",
-    image: "/eye3.png",
-    category: "Khoa Mắt Mũi",
+    title: "Khám da liễu thẩm mỹ",
+    desc: "Tư vấn và điều trị các vấn đề về da cho mục đích thẩm mỹ.",
+    image: "/derma3.png",
+    category: "Khoa Da liễu",
+  },
+  {
+    id: 19,
+    title: "Khám dị ứng",
+    desc: "Xét nghiệm, chẩn đoán và điều trị các bệnh lý dị ứng.",
+    image: "/derma4.png",
+    category: "Khoa Da liễu",
+  },
+  {
+    id: 20,
+    title: "Khám nhi tai mũi họng",
+    desc: "Tầm soát và điều trị các bệnh lý tai mũi họng ở trẻ em.",
+    image: "/ent2.png",
+    category: "Khoa Tai mũi họng",
+  },
+  {
+    id: 21,
+    title: "Nội soi tai mũi họng",
+    desc: "Chẩn đoán chính xác các bệnh lý tai mũi họng bằng thiết bị nội soi hiện đại.",
+    image: "/ent3.png",
+    category: "Khoa Tai mũi họng",
+  },
+  {
+    id: 22,
+    title: "Khám sức khỏe trẻ em",
+    desc: "Theo dõi phát triển thể chất, tinh thần và tiêm chủng cho trẻ.",
+    image: "/pediatrics2.png",
+    category: "Khoa Nhi khoa",
+  },
+  {
+    id: 23,
+    title: "Khám tầm soát ung thư",
+    desc: "Kiểm tra định kỳ phát hiện sớm các dấu hiệu ung thư.",
+    image: "/oncology1.png",
+    category: "Khoa Nội khoa",
+  },
+  {
+    id: 24,
+    title: "Điều trị đau đầu mãn tính",
+    desc: "Chẩn đoán nguyên nhân và điều trị các loại đau đầu kéo dài.",
+    image: "/internal2.png",
+    category: "Khoa Nội khoa",
+  },
+  {
+    id: 25,
+    title: "Khám và tư vấn dinh dưỡng",
+    desc: "Xây dựng chế độ ăn hợp lý cho trẻ em, người lớn và phụ nữ mang thai.",
+    image: "/nutrition1.png",
+    category: "Khoa Nhi khoa",
+  },
+  {
+    id: 26,
+    title: "Khám bệnh ngoài giờ",
+    desc: "Hỗ trợ khám chữa bệnh vào các ngày cuối tuần và ngoài giờ hành chính.",
+    image: "/general1.png",
+    category: "Khoa Nội khoa",
+  },
+  {
+    id: 27,
+    title: "Khám tổng quát cho người cao tuổi",
+    desc: "Theo dõi và chăm sóc sức khỏe toàn diện cho người già.",
+    image: "/geriatrics1.png",
+    category: "Khoa Nội khoa",
   },
 ];
 
 export default function Services() {
+  const [categories, setCategories] = useState([{ name: "Tất cả" }]);
   const [selectedCat, setSelectedCat] = useState("Tất cả");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const perPage = 9;
 
+  // Fetch specialties from API
+  useEffect(() => {
+    fetch("http://localhost:8000/api/specialties")
+      .then((res) => res.json())
+      .then((data) => {
+        // API may return array of specialties or an object with results
+        const apiSpecialties = Array.isArray(data)
+          ? data
+          : (data.results || []);
+        setCategories([
+          { name: "Tất cả" },
+          ...apiSpecialties.map((spec) => ({
+            name: "Khoa " + (spec.specialty || spec.name || spec),
+          })),
+        ]);
+      })
+      .catch(() => {
+        setCategories([
+          { name: "Tất cả" },
+          { name: "Khoa Sản phụ khoa" },
+          { name: "Khoa Mắt" },
+          { name: "Khoa Răng hàm mặt" },
+          { name: "Khoa Nội khoa" },
+          { name: "Khoa Da liễu" },
+          { name: "Khoa Ngoại khoa" },
+          { name: "Khoa Nhi khoa" },
+          { name: "Khoa Tai mũi họng" },
+        ]);
+      });
+  }, []);
+
+  // Normalize Vietnamese strings for search/filter
+  const vnStr = s =>
+    s
+      ? s
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/đ/g, 'd')
+          .replace(/Đ/g, 'D')
+      : "";
+
+  // Filter services
   const filteredServices = services.filter(
     (s) =>
-      (selectedCat === "Tất cả" || s.category === selectedCat) &&
-      (s.title.toLowerCase().includes(search.toLowerCase()) ||
-        s.desc.toLowerCase().includes(search.toLowerCase()))
+      (selectedCat === "Tất cả" ||
+        vnStr(s.category).toLowerCase() === vnStr(selectedCat).toLowerCase()) &&
+      (vnStr(s.title).toLowerCase().includes(vnStr(search).toLowerCase()) ||
+        vnStr(s.desc).toLowerCase().includes(vnStr(search).toLowerCase()))
   );
+
+  // Paging
+  const totalPages = Math.ceil(filteredServices.length / perPage);
+  const pagedServices = filteredServices.slice(
+    (page - 1) * perPage,
+    page * perPage
+  );
+
+  // Reset page when filter/search changes
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCat, search]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setPage(newPage);
+  };
 
   return (
     <div className="flex gap-8 bg-white min-h-screen p-6">
@@ -182,51 +295,77 @@ export default function Services() {
             <button
               key={cat.name}
               onClick={() => setSelectedCat(cat.name)}
-              className={`flex justify-between items-center px-4 py-2 rounded ${
+              className={`flex px-4 py-2 rounded text-left ${
                 selectedCat === cat.name
                   ? "bg-teal-700 text-white font-semibold"
                   : "bg-white text-gray-900 hover:bg-teal-50"
               }`}
             >
-              <span className="text-left">{cat.name}</span>
-              <span
-                className={`ml-2 text-sm px-2 py-0.5 rounded ${
-                  selectedCat === cat.name
-                    ? "bg-teal-800"
-                    : "bg-gray-100 text-gray-700"
-                }`}
-              >
-                {cat.count}
-              </span>
+              {cat.name}
             </button>
           ))}
         </div>
       </div>
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredServices.map((s) => (
-          <div
-            key={s.id}
-            className="bg-white rounded shadow-sm border overflow-hidden flex flex-col max-h-[320px] min-h-[320px]"
-          >
-            <div className="w-full h-56 bg-gray-100">
-              <img
-                src={s.image}
-                alt={s.title}
-                className="w-full h-full object-cover"
-                draggable={false}
-              />
+      <div className="flex-1 flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 flex-1">
+          {pagedServices.map((s) => (
+            <div
+              key={s.id}
+              className="bg-white rounded shadow-sm border overflow-hidden flex flex-col max-h-[320px] min-h-[320px]"
+            >
+              <div className="w-full h-56 bg-gray-100">
+                <img
+                  src={s.image}
+                  alt={s.title}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+              </div>
+              <div className="flex-1 flex flex-col p-4">
+                <h3 className="font-bold text-lg mb-2">{s.title}</h3>
+                <p className="text-gray-700 text-sm mb-2 flex-1 line-clamp-2">
+                  {s.desc}
+                </p>
+                <span className="text-xs text-gray-500">{s.category}</span>
+              </div>
             </div>
-            <div className="flex-1 flex flex-col p-4">
-              <h3 className="font-bold text-lg mb-2">{s.title}</h3>
-              <p className="text-gray-700 text-sm mb-2 flex-1 line-clamp-2">
-                {s.desc}
-              </p>
+          ))}
+          {pagedServices.length === 0 && (
+            <div className="col-span-3 text-gray-500 text-center py-8">
+              Không tìm thấy dịch vụ phù hợp.
             </div>
-          </div>
-        ))}
-        {filteredServices.length === 0 && (
-          <div className="col-span-3 text-gray-500 text-center py-8">
-            Không tìm thấy dịch vụ phù hợp.
+          )}
+        </div>
+        {/* Paging Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-8 gap-2">
+            <button
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+              className="px-3 py-1 rounded border border-teal-600 text-teal-700 bg-white hover:bg-teal-50 disabled:opacity-50"
+            >
+              {"<"}
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => handlePageChange(i + 1)}
+                className={`px-3 py-1 rounded border ${
+                  page === i + 1
+                    ? "bg-teal-700 text-white border-teal-700"
+                    : "border-teal-600 text-teal-700 bg-white hover:bg-teal-50"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+              className="px-3 py-1 rounded border border-teal-600 text-teal-700 bg-white hover:bg-teal-50 disabled:opacity-50"
+            >
+              {">"}
+            </button>
           </div>
         )}
       </div>

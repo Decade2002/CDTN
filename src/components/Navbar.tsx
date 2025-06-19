@@ -75,7 +75,7 @@ export default function Navbar() {
                 <Link href="/contact" className="text-black font-semibold hover:text-teal-700 transition hover:underline underline-offset-4">Liên Hệ</Link>
               </li>
               <li>
-                <Link href="/doctor" className="text-black font-semibold hover:text-teal-700 transition hover:underline underline-offset-4">Bác sĩ</Link>
+                <Link href="/doctor" className="text-black font-semibold hover:text-teal-700 transition hover:underline underline-offset-4">Đặt Lịch</Link>
               </li>
             </ul>
             {!isSignedIn ? (
@@ -121,6 +121,13 @@ export default function Navbar() {
                       onClick={() => setOpenDropdown(false)}
                     >
                       Xem kết quả khám
+                    </Link>
+                    <Link
+                      href="/bill"
+                      className="block px-4 py-3 hover:bg-teal-50 text-teal-800 font-medium"
+                      onClick={() => setOpenDropdown(false)}
+                    >
+                      Xem hóa đơn
                     </Link>
                     <button
                       className="w-full text-left px-4 py-3 hover:bg-teal-50 text-red-600 font-medium"

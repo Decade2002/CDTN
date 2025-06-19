@@ -13,7 +13,7 @@ export default function MedicalResultTable() {
     fetch("http://127.0.0.1:8000/api/medical-records/", {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${access_token}`,
+        Authorization: `Bearer ${access_token}`,
         "Content-Type": "application/json",
       },
     })
@@ -22,7 +22,7 @@ export default function MedicalResultTable() {
         return response.json();
       })
       .then((data) => {
-        // If your API returns { data: [...] }, adjust accordingly
+        console.log(data)
         setMedicalRecords(data.data || data);
         setLoading(false);
       })
@@ -35,7 +35,7 @@ export default function MedicalResultTable() {
   const getStatusText = (status) => {
     switch (status) {
       case "loading":
-        return "Đang chuẩn đoán";
+        return "Đang tiến hành";
       case "done":
         return "Đã hoàn thành";
       default:
@@ -45,7 +45,7 @@ export default function MedicalResultTable() {
 
   return (
     <div className="flex justify-center mt-10 mb-10">
-      <div className="w-[70vw]">
+      <div className="w-full max-w-4xl">
         <h2 className="text-2xl font-bold mb-6 text-teal-700">Kết quả y tế</h2>
         {loading ? (
           <div className="text-teal-700">Đang tải...</div>
@@ -56,26 +56,45 @@ export default function MedicalResultTable() {
             <table className="min-w-full border border-teal-600 rounded-lg bg-white shadow">
               <thead>
                 <tr className="bg-teal-100 text-teal-800">
-                  <th className="p-4 border-b border-teal-600 text-left">Trạng thái</th>
-                  <th className="p-4 border-b border-teal-600 text-left">Triệu chứng</th>
-                  <th className="p-4 border-b border-teal-600 text-left">Chuẩn đoán</th>
-                  <th className="p-4 border-b border-teal-600 text-left">Giải pháp trị liệu</th>
+                  <th className="p-4 border-b border-teal-600 text-left w-32">
+                    Trạng thái
+                  </th>
+                  <th className="p-4 border-b border-teal-600 text-left w-60">
+                    Triệu chứng
+                  </th>
+                  <th className="p-4 border-b border-teal-600 text-left w-60">
+                    Chuẩn đoán
+                  </th>
+                  <th className="p-4 border-b border-teal-600 text-left w-60">
+                    Giải pháp trị liệu
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {medicalRecords.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="text-center py-6 text-gray-500">
+                    <td
+                      colSpan={4}
+                      className="text-center py-6 text-gray-500"
+                    >
                       Không có kết quả y tế nào.
                     </td>
                   </tr>
                 ) : (
                   medicalRecords.map((record, idx) => (
                     <tr key={record.id || idx} className="hover:bg-teal-50">
-                      <td className="p-4 border-b border-teal-100">{getStatusText(record.record_status)}</td>
-                      <td className="p-4 border-b border-teal-100">{record.record_note}</td>
-                      <td className="p-4 border-b border-teal-100">{record.diagnosis}</td>
-                      <td className="p-4 border-b border-teal-100">{record.treatment}</td>
+                      <td className="p-4 border-b border-teal-100 align-top break-words whitespace-pre-line max-w-[8rem]">
+                        {getStatusText(record.record_status)}
+                      </td>
+                      <td className="p-4 border-b border-teal-100 align-top break-words whitespace-pre-line max-w-[15rem]">
+                        {record.record_note}
+                      </td>
+                      <td className="p-4 border-b border-teal-100 align-top break-words whitespace-pre-line max-w-[15rem]">
+                        {record.diagnosis}
+                      </td>
+                      <td className="p-4 border-b border-teal-100 align-top break-words whitespace-pre-line max-w-[15rem]">
+                        {record.treatment}
+                      </td>
                     </tr>
                   ))
                 )}
@@ -84,6 +103,12 @@ export default function MedicalResultTable() {
           </div>
         )}
       </div>
+      <style jsx global>{`
+        td,
+        th {
+          word-break: break-word;
+        }
+      `}</style>
     </div>
   );
 }

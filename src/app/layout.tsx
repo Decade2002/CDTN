@@ -11,9 +11,9 @@ export default function Layout({ children } : { children: React.ReactNode }) {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
                 <link href="https://fonts.googleapis.com/css?family=Lato:400,700&display=swap" rel="stylesheet"></link>
             </head>
-            <body>
+            <body className="flex flex-col min-h-screen h-full">
                 <Navbar/>
-                <main>
+                <main className="flex-1">
                     { children }
                 </main>
                 <Footer></Footer>

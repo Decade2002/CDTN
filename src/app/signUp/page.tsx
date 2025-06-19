@@ -26,6 +26,7 @@ export default function RegisterForm() {
   
   const onChange = (e: { target: { name: any; value: any; }; }) => {
     const { name, value } = e.target;
+    console.log(value)
     setForm((prev) => ({
       ...prev,
       [name]: value,
@@ -47,8 +48,8 @@ export default function RegisterForm() {
       });
       if (!response.ok) {
         const data = await response.json();
-        console.log(form.birth_day)
-        throw new Error(data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+        console.log(data);
+        throw new Error (data)
       }
       setSuccess("Đăng ký thành công! Vui lòng nhập mã xác nhận.");
       setRegisterGmail(form.gmail);
@@ -65,6 +66,7 @@ export default function RegisterForm() {
         gmail: "",
       });
     } catch (err) {
+      console.log(err)
       setError(err.message || "Đăng ký thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
@@ -239,7 +241,7 @@ export default function RegisterForm() {
         </button>
       </div>
       {showOtp && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-opacity-30 flex items-center justify-center z-50">
           <form
             className="bg-white rounded-lg p-8 shadow-lg flex flex-col items-center"
             onSubmit={onConfirmOtp}

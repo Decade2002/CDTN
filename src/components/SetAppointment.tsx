@@ -2,8 +2,6 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
-// Nếu bạn dùng next/image thì import Image từ 'next/image'
-// import Image from "next/image";
 
 export default function SetAppointment({doctors}) {
   const [form, setForm] = useState({
@@ -45,10 +43,10 @@ export default function SetAppointment({doctors}) {
         if (!res.ok) throw a;
         setSuccess("Đặt lịch thành công!");
         setForm({ date: "", time: "", doctor_user_id: "" });
-        window.open(`http://localhost:8000/payment/${a.payment_id}/`)
+        router.push("/appointment")
       } catch (err) {
         console.log(err)
-        setError(err.date[0]);
+        setError(err.date || err.time || err.message);
       } finally {
         setLoading(false);
       }
@@ -60,11 +58,35 @@ export default function SetAppointment({doctors}) {
   // Tạo danh sách các giờ khám mẫu
   const timeSlots = [
     "08:00",
+    "08:15",
+    "08:30",
+    "08:45",
     "09:00",
+    "09:15",
+    "09:30",
+    "09:45",
     "10:00",
+    "10:15",
+    "10:30",
+    "10:45",
+    "11:00",
+    "11:15",
+    "11:30",
+    "11:45",
+    "13:30",
+    "13:45",
     "14:00",
+    "14:15",
+    "14:30",
+    "14:45",
     "15:00",
+    "15:15",
+    "15:30",
+    "15:45",
     "16:00",
+    "16:15",
+    "16:30",
+    "16:45",
   ];
   const filteredDoctors = doctors.filter((doc) =>
     doc.full_name?.toLowerCase().includes(searchTerm.trim().toLowerCase())
@@ -144,7 +166,8 @@ export default function SetAppointment({doctors}) {
                       setSearchTerm("");
                     }}
                   >
-                    {doc.full_name}
+                    {doc.degree} {doc.full_name}
+                    <span className="text-left px-4 py-2 hover:bg-teal-50 text-teal-700">({doc.specialty})</span>
                   </button>
                 ))}
               </div>

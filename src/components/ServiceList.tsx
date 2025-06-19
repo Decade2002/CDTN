@@ -46,9 +46,6 @@ export default function ServiceList() {
         <h2 className="text-2xl md:text-3xl font-bold text-teal-700 text-center mb-2">
           Dịch vụ mà chúng tôi cung cấp
         </h2>
-        <p className="text-center text-gray-700 mb-10 max-w-2xl mx-auto">
-          Lorem ipsum dolor sit amet consectetur adipiscing elit semper dalar elementum tempus hac tellus libero accumsan.
-        </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service) => (
             <div key={service.title} className="bg-white rounded-xl shadow-sm p-5 flex flex-col h-full">
@@ -64,7 +61,7 @@ export default function ServiceList() {
               <h3 className="font-semibold text-lg text-teal-700 mb-1">{service.title}</h3>
               <p className="text-gray-700 text-sm flex-1 mb-4">{service.desc}</p>
               <a
-                href="#"
+                href="/service"
                 className="text-teal-700 font-semibold text-sm mt-auto flex items-center gap-1 hover:underline"
               >
                 Tìm hiểu thêm
