@@ -73,7 +73,7 @@ export default function RegisterForm() {
     }
   };
 
-  const onConfirmOtp = async (e: React.FormEvent) => {
+  const onConfirmOtp = async (e) => {
     e.preventDefault();
     setOtpError("");
     // You might need to send username/email + otp, adapt as needed
@@ -86,6 +86,7 @@ export default function RegisterForm() {
         body: JSON.stringify({ gmail: registerGmail, otp }),
       });
       const data = await response.json();
+      console.log("data: " + data)
       if (!response.ok) {
         throw new Error(
           data?.message ||
